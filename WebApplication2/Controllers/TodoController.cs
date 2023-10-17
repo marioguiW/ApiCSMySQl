@@ -10,7 +10,7 @@ namespace MeuTodo.Controladores
     [Route("v1")]
     public class TodoController : ControllerBase
     {
-
+         
         [HttpGet]
         [Route("todos")]
         public async Task<IActionResult> GetAsync([FromServices] BDContexto contexto)
@@ -53,8 +53,35 @@ namespace MeuTodo.Controladores
             await contexto.Todos.AddAsync(todo);
             await contexto.SaveChangesAsync();
             return Created($"v1/todos/{todo.Id}", todo);
-
         }
 
+        [HttpPut("todos/{id}")]
+        public async Task<IActionResult> PutAsync([FromServices] BDContexto contexto, [FromBody] CreateTodoViewModel title, [FromRoute] int id)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
+
+            var todo = await contexto.Todos.FirstOrDefaultAsync(tarefa => tarefa.Id == id);
+
+            todo.Title = title.Title;
+            
+            contexto.Todos.Update(todo);
+            await contexto.SaveChangesAsync();
+            return Ok(todo);
+        }
+
+        [HttpDelete("todos/{id}")]
+        public async Task<IActionResult> DeleteAsync([FromServices] BDContexto contexto, [FromRoute] int id)
+        {
+            var todo = await contexto.Todos.FirstOrDefaultAsync(tarefa => tarefa.Id == id);
+
+            contexto.Todos.Remove(todo);
+
+            await contexto.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

@@ -9,7 +9,7 @@ public class BDContexto : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         
-            var conectionString = "server=localhost;database=todos;user=root;password=mariogui123";
+            var conectionString = "Server=localhost;Database=Todo;User=root;Password=mariogui123";
 
             options.UseMySql(conectionString, ServerVersion.AutoDetect(conectionString));
         

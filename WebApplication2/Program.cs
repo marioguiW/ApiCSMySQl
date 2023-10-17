@@ -1,45 +1,59 @@
 using MeuTodo.Data;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.Extensions.DependencyInjection;
 
-namespace WebApplication2;
-
-public class Program
+namespace WebApplication2
 {
-    public static void Main(string[] args)
+    public class Program
     {
-        var builder = WebApplication.CreateBuilder(args);
-
-        builder.Services.AddDbContext<BDContexto>();
-
-        builder.Services.AddControllers();
-
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
-
-        var app = builder.Build();
-
-
-        app.UseRouting();
-
-        app.UseEndpoints(endpoints =>
+        public static void Main(string[] args)
         {
-            endpoints.MapControllerRoute(
-                name: "default",
-                pattern: "{controller=Home}/action=Index/{id?}");
-        });
+            var builder = WebApplication.CreateBuilder(args);
 
-        if (app.Environment.IsDevelopment())
-        {
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            builder.Services.AddDbContext<BDContexto>();
+
+            builder.Services.AddControllers();
+
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            // Configurar o CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(builder =>
+                {
+                    builder.AllowAnyOrigin()
+                           .AllowAnyMethod()
+                           .AllowAnyHeader();
+                });
+            });
+
+            var app = builder.Build();
+
+            app.UseRouting();
+
+            // Habilitar o middleware CORS
+            app.UseCors();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/action=Index/{id?}");
+            });
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseHttpsRedirection();
+            app.UseAuthorization();
+
+            app.MapControllers();
+
+            app.Run();
         }
-
-        app.UseHttpsRedirection();
-
-        app.UseAuthorization();
-
-
-        app.MapControllers();
-
-        app.Run();
     }
 }
